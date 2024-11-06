@@ -1,12 +1,18 @@
+require("dotenv").config(); // Load environment variables
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
+const GeminiService = require("./src/services/geminiService"); // Import GeminiService
 const app = express();
-const PORT = 5001;
+const PORT = 3000;
+
+// Load API key from environment variables
+const geminiApiKey = process.env.GEMINI_API_KEY;
+const geminiService = new GeminiService(geminiApiKey); // Initialize GeminiService
 
 // CORS configuration
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: "http://localhost:5173", // Allow requests from your frontend
   methods: ["POST", "GET", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Accept"],
   credentials: true,
@@ -26,9 +32,9 @@ app.use((req, res, next) => {
 });
 
 // Load data files
-const patents = JSON.parse(fs.readFileSync("./data/patents.json", "utf8"));
+const patents = JSON.parse(fs.readFileSync("./src/data/patents.json", "utf8"));
 const products = JSON.parse(
-  fs.readFileSync("./src/company_products.json", "utf8")
+  fs.readFileSync("./src/data/company_products.json", "utf8")
 );
 
 // Create a mapping of company products for easier lookup
@@ -50,7 +56,7 @@ app.get("/test", (req, res) => {
 });
 
 // API route to handle infringement check
-app.post("/infringement-check", express.json(), (req, res) => {
+app.post("/api/infringement-check", async (req, res) => {
   console.log("=== Infringement Check Request ===");
   console.log("Headers:", req.headers);
   console.log("Body:", req.body);
@@ -91,20 +97,17 @@ app.post("/infringement-check", express.json(), (req, res) => {
     });
   }
 
-  // Placeholder for infringement logic
-  const topInfringingProducts = []; // Will contain top 2 products later
-
-  const response = {
-    analysis_id: "1",
-    patent_id: patentId,
-    company_name: companyName,
-    analysis_date: new Date().toISOString(),
-    top_infringing_products: topInfringingProducts,
-    overall_risk_assessment: "Low (to be calculated)",
-  };
-
-  console.log("Sending response:", response);
-  res.json(response);
+  try {
+    // Use GeminiService to analyze patent infringement
+    const analysis = await geminiService.analyzePatentInfringement(
+      patent,
+      products
+    );
+    res.json(analysis);
+  } catch (error) {
+    console.error("Error during analysis:", error);
+    res.status(500).json({ error: "Failed to analyze patent infringement" });
+  }
 });
 
 // Error handling middleware
