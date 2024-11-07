@@ -80,6 +80,10 @@ const PatentChecker = () => {
             <h2 className="text-2xl font-bold text-gray-800 mb-4">
               Infringement Results
             </h2>
+            <p className="text-gray-600 mb-4">
+              Analysis Date:{" "}
+              {new Date(results.analysis_timestamp).toLocaleString()}
+            </p>
             {results.top_infringing_products.map((product, index) => (
               <div key={index} className="mb-4">
                 <h3 className="text-xl font-semibold text-gray-700">
@@ -92,6 +96,9 @@ const PatentChecker = () => {
                   Relevant Claims: {product.relevant_claims.join(", ")}
                 </p>
                 <p className="text-gray-600">{product.explanation}</p>
+                <p className="text-gray-600">
+                  Specific Features: {product.specific_features}
+                </p>
               </div>
             ))}
             <div className="mt-6 p-6 bg-gray-50 rounded-lg">

@@ -4,43 +4,60 @@ A web application that analyzes potential patent infringements by comparing pate
 
 ## Project Structure
 
+```
 patent-checker/
 ├── client/ # React frontend
 ├── server/ # Express backend
 └── docker-compose.yml
+```
 
 ## Running Locally (Without Docker)
 
+### Prerequisites
+
+1. **Create a `.env` File**
+
+   Before starting the server, create a `.env` file in the `server` directory and add your Gemini API key:
+
+   ```plaintext
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
 ### 1. Start the Backend Server
 
-bash
-Navigate to server directory
+```bash
+# Navigate to server directory
 cd server
-Install dependencies
+# Install dependencies
 npm install
-Start the server
+# Start the server
 npm start
+```
+
 Server will run on http://localhost:3000
 
 ### 2. Start the Frontend Application
 
-(bash)
-Open a new terminal
-Navigate to client directory
+```bash
+# Open a new terminal
+# Navigate to client directory
 cd client
-Install dependencies
+# Install dependencies
 npm install
-Start the development server
+# Start the development server
 npm run dev
+```
+
 Frontend will run on http://localhost:5173
 
 ## Running with Docker
 
 ### 1. Build and Start the Containers
 
-bash
-From the root directory
+```bash
+# From the root directory
 docker-compose up --build
+```
 
 The application will be available at:
 
@@ -49,8 +66,9 @@ The application will be available at:
 
 ### 2. Stop the Containers
 
-bash
+```bash
 docker-compose down
+```
 
 ## Usage
 
@@ -61,14 +79,14 @@ docker-compose down
 
 ## Example Input
 
-Patent ID: US-RE49889-E1
+Patent ID: US-RE49889-E1  
 Company Name: Walmart Inc.
 
 ## Development
 
 ### Backend API Endpoints
 
-- `POST /api/check-infringement`
+- `POST /api/infringement-check`
   - Request body:
     ```json
     {
@@ -79,10 +97,14 @@ Company Name: Walmart Inc.
 
 ### Available Scripts
 
-Backend:
-bash
-npm start # Start the server
+**Backend:**
 
-Frontend:
-bash
+```bash
+npm start # Start the server
+```
+
+**Frontend:**
+
+```bash
 npm run dev # Start development server
+```
