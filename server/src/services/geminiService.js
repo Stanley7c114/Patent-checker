@@ -1,4 +1,5 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import fetch from "node-fetch";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 class GeminiService {
   constructor(apiKey) {
@@ -8,28 +9,20 @@ class GeminiService {
 
   async analyzePatentInfringement(patentData, productData) {
     try {
-      const analysisTimestamp = new Date().toISOString(); // Capture the current date and time
-      console.log("Analysis Timestamp:", analysisTimestamp);
-      // Log the structure of patentData
-      // console.log("Patent Data:", patentData);
+      const analysisTimestamp = new Date().toISOString();
 
-      // Ensure claims is an array
       const claims = Array.isArray(patentData.claims) ? patentData.claims : [];
 
-      // Construct a prompt for the generative model
       const prompt = `Analyze potential patent infringement for the following patent and products:
       Patent: ${patentData.title} (${patentData.publication_number})
       Claims: ${claims.map((claim) => claim.text).join(" ")}
       Products: ${productData.map((product) => product.name).join(", ")}
       For each product, detail which claims are at issue and provide an explanation of why the product potentially infringes the patent.`;
 
-      // Use the generative model to generate content
       const result = await this.model.generateContent(prompt);
 
-      // Extract the analysis text from the response
       const analysisText = result.response.text();
 
-      // Parse the analysis text to determine top infringing products
       const topInfringingProducts = this.parseAnalysis(
         analysisText,
         productData
@@ -39,7 +32,7 @@ class GeminiService {
         analysis: analysisText,
         top_infringing_products: topInfringingProducts,
         overall_risk_assessment: this.assessRisk(topInfringingProducts),
-        analysis_timestamp: analysisTimestamp, // Include analysis timestamp
+        analysis_timestamp: analysisTimestamp,
       };
     } catch (error) {
       console.error("Error querying Gemini API:", error);
@@ -49,9 +42,7 @@ class GeminiService {
 
   parseAnalysis(analysisText, productData) {
     const infringingProducts = [];
-    const productSections = analysisText.split(/\*\*\d*\.\s*[A-Za-z\s]+:\*\*/); // Improved split
-
-    console.log("Product Sections:", productSections); // Debugging output
+    const productSections = analysisText.split(/\*\*\d*\.\s*[A-Za-z\s]+:\*\*/);
 
     productData.forEach((product) => {
       productSections.forEach((section) => {
@@ -93,12 +84,11 @@ class GeminiService {
       });
     });
 
-    console.log("Infringing Products:", infringingProducts); // Final output for debugging
+    // console.log("Infringing Products:", infringingProducts);
     return infringingProducts.slice(0, 2);
   }
 
   extractProductSection(analysisText, productName) {
-    // Extract the section of the analysis text related to the specific product
     const productPattern = new RegExp(
       `Product: ${productName}.*?(?=Product:|$)`,
       "s"
@@ -108,7 +98,6 @@ class GeminiService {
   }
 
   extractClaims(analysisText, productName) {
-    // Extract relevant claims from the analysis text
     const claims = [];
     const claimPattern = /Claim \d+/g;
     let match;
@@ -119,21 +108,18 @@ class GeminiService {
   }
 
   extractExplanation(analysisText, productName) {
-    // Extract the explanation from the analysis text
     const explanationPattern = /Explanation: (.*?)(?=Specific Features:|$)/s;
     const match = explanationPattern.exec(analysisText);
     return match ? match[1].trim() : "No explanation provided.";
   }
 
   extractSpecificFeatures(analysisText, productName) {
-    // Extract specific features from the analysis text
     const featuresPattern = /Specific Features: (.*?)(?=Product:|$)/s;
     const match = featuresPattern.exec(analysisText);
     return match ? match[1].trim() : "No specific features provided.";
   }
 
   assessRisk(infringingProducts) {
-    // Assess overall risk based on infringing products
     if (infringingProducts.length > 4) {
       return "High";
     } else if (
@@ -147,4 +133,4 @@ class GeminiService {
   }
 }
 
-module.exports = GeminiService;
+export default GeminiService;

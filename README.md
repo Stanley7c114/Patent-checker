@@ -52,6 +52,16 @@ Frontend will run on http://localhost:5173
 
 ## Running with Docker
 
+### Prerequisites
+
+1. **Create a `.env` File**
+
+   Before starting the server, create a `.env` file in the `server` directory and add your Gemini API key:
+
+   ```plaintext
+   GEMINI_API_KEY=your_gemini_api_key_here
+   ```
+
 ### 1. Build and Start the Containers
 
 ```bash
@@ -80,7 +90,7 @@ docker-compose down
 ## Example Input
 
 Patent ID: US-RE49889-E1  
-Company Name: Walmart Inc.
+Company Name: Walmart
 
 ## Development
 
